@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LSAT Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1e1f25;
+      color: #eaeaea;
+      display: flex;
+      min-height: 100vh;
+    }
+    a, button {
+      cursor: pointer;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2a2b32;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4f5056;
+      border-radius: 4px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background-color: #2a2b32;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem;
+    }
+    .sidebar h2 {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .nav-item {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: #bfbfbf;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      background-color: #484a52;
+      color: #fff;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    .section {
+      display: none; /* Shown via JS */
+    }
+    .section.active {
+      display: block;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: #2d9cdb;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #2383b8;
+    }
+    .list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .list-item {
+      background-color: #2f3036;
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .del-btn {
+      background: #d64c4c;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .del-btn:hover {
+      background: #c0392b;
+    }
+    .form-row {
+      margin-bottom: 1rem;
+    }
+    .form-row label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #cfcfcf;
+    }
+    .form-row input, 
+    .form-row select, 
+    .form-row textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #393a40;
+      border-radius: 4px;
+      background-color: #2f3036;
+      color: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    table thead {
+      background-color: #3a3b44;
+    }
+    table th, table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #444;
+      text-align: left;
+    }
+    table th {
+      color: #fff;
+    }
+    table td {
+      color: #ddd;
+    }
+
+    /* Content Library (Folder Grid) */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .folder-card {
+      background-color: #2f3036;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      color: #d0d0d0;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    .folder-card:hover {
+      background-color: #3a3b44;
+    }
+    .folder-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .search-sort-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .search-sort-bar input[type="text"] {
+      flex: 1;
+      padding: 0.5rem 1rem;
+      border: 1px solid #393a40;
+      border-radius: 4px;
+      background-color: #2f3036;
+      color: #fff;
+    }
+    .search-sort-bar select {
+      padding: 0.5rem 1rem;
+      border: 1px solid #393a40;
+      border-radius: 4px;
+      background-color: #2f3036;
+      color: #fff;
+      width: 150px;
+    }
+    /* Folder Details */
+    .folder-details {
+      display: none;
+    }
+    .folder-details.active {
+      display: block;
+    }
+    .folder-details-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .content-item {
+      background-color: #2f3036;
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .content-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .content-info h3 {
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .content-meta {
+      font-size: 0.85rem;
+      color: #bfbfbf;
+    }
+    .content-actions button {
+      background: #d64c4c;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .content-actions button:hover {
+      background: #c0392b;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal {
+      background-color: #2f3036;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 550px;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    .modal h2 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #999;
+    }
+    .modal-close:hover {
+      color: #fff;
+    }
+    /* Modal Tabs for Add Content */
+    .modal-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .modal-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem 0;
+      background: #393a40;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .modal-tab.active {
+      background: #484a52;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Drag & Drop - Fully Functional */
+    .dropzone {
+      border: 2px dashed #4f5056;
+      border-radius: 4px;
+      padding: 2rem;
+      text-align: center;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+    .dropzone.dragover {
+      border-color: #2d9cdb;
+      background-color: #2a2b32;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .nav-item {
+        width: 45%;
+        margin: 0.5rem;
+        text-align: center;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>LSAT Admin</h2>
+    <a href="#" class="nav-item active" data-section="dashboardSection">Dashboard</a>
+    <a href="#" class="nav-item" data-section="classesSection">Classes</a>
+    <a href="#" class="nav-item" data-section="tutorsSection">Tutors</a>
+    <a href="#" class="nav-item" data-section="usersSection">Users</a>
+    <a href="#" class="nav-item" data-section="progressSection">Progress</a>
+    <a href="#" class="nav-item" data-section="enrollmentsSection">Enrollments</a>
+    <a href="#" class="nav-item" data-section="contentLibrarySection">Content Library</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- Dashboard Section -->
+    <div class="section active" id="dashboardSection">
+      <div class="header">
+        <h1>Dashboard</h1>
+      </div>
+      <div id="dashboardStats" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+    </div>
+
+    <!-- Classes Section -->
+    <div class="section" id="classesSection">
+      <div class="header">
+        <h1>Classes</h1>
+        <button class="btn" id="btnAddClass">Add Class</button>
+      </div>
+      <div class="list" id="classesList"></div>
+    </div>
+
+    <!-- Tutors Section -->
+    <div class="section" id="tutorsSection">
+      <div class="header">
+        <h1>Tutors</h1>
+        <button class="btn" id="btnAddTutor">Add Tutor</button>
+      </div>
+      <div class="list" id="tutorsList"></div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="section" id="usersSection">
+      <div class="header">
+        <h1>Users</h1>
+        <button class="btn" id="btnAddUser">Add User</button>
+      </div>
+      <div class="list" id="usersList"></div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="section" id="progressSection">
+      <div class="header">
+        <h1>Progress</h1>
+        <button class="btn" id="btnAddProgress">Add Progress</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Class</th>
+            <th>Progress (%)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="progressTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Enrollments Section -->
+    <div class="section" id="enrollmentsSection">
+      <div class="header">
+        <h1>Enrollments</h1>
+        <button class="btn" id="btnAddEnrollment">Add Enrollment</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Class</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="enrollmentsTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Content Library Section -->
+    <div class="section" id="contentLibrarySection">
+      <!-- Folder List View -->
+      <div class="folder-list-view" id="folderListView">
+        <div class="header">
+          <h1>Content Library</h1>
+          <div class="actions">
+            <button class="btn" id="btnAddContent">Add Content</button>
+            <button class="btn" id="btnCreateFolder">Create Folder</button>
+          </div>
+        </div>
+        <div class="search-sort-bar">
+          <input type="text" id="searchInput" placeholder="Search folders..." />
+          <select id="sortSelect">
+            <option value="default">Sort by</option>
+            <option value="date">Date Created</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+        <div class="folder-grid" id="folderGrid"></div>
+      </div>
+
+      <!-- Folder Details View -->
+      <div class="folder-details" id="folderDetails" style="display:none;">
+        <div class="header">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="btn" id="btnBackToFolders">&larr; Back</button>
+            <h2 id="folderTitle"></h2>
+          </div>
+          <div class="actions">
+            <button class="btn" id="btnAddContentInFolder">Add Content</button>
+          </div>
+        </div>
+        <div class="folder-details-list" id="contentList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERIC MODAL (for Classes, Tutors, Users, Progress, Enrollments) -->
+  <div class="modal-backdrop" id="modalBackdropGeneric">
+    <div class="modal" id="modalGeneric">
+      <span class="modal-close" id="modalCloseGeneric">&times;</span>
+      <h2 id="genericModalTitle"></h2>
+      <div id="genericModalBody"></div>
+      <button class="btn" id="genericModalSaveBtn">Save</button>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE FOLDER -->
+  <div class="modal-backdrop" id="modalBackdropFolder">
+    <div class="modal" id="modalCreateFolder">
+      <span class="modal-close" id="modalCloseFolder">&times;</span>
+      <h2>Create New Folder</h2>
+      <input type="text" id="folderNameInput" placeholder="Folder name..." style="width:100%; margin-bottom:1rem;" />
+      <button class="btn" id="folderSaveBtn">Create Folder</button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD CONTENT -->
+  <div class="modal-backdrop" id="modalBackdropContent">
+    <div class="modal" id="modalAddContent">
+      <span class="modal-close" id="modalCloseContent">&times;</span>
+      <h2>Add New Content</h2>
+      <!-- Folder selection (if not in folder view) -->
+      <div class="form-row" id="contentFolderSelectRow" style="display: none;">
+        <label for="contentFolderSelect">Select Folder</label>
+        <select id="contentFolderSelect"></select>
+      </div>
+      <!-- Modal Tabs -->
+      <div class="modal-tabs">
+        <div class="modal-tab active" data-tab="tabUpload">Upload</div>
+        <div class="modal-tab" data-tab="tabCreate">Create</div>
+        <div class="modal-tab" data-tab="tabLink">Link</div>
+      </div>
+      <!-- Tab Content: Upload -->
+      <div class="tab-content active" id="tabUpload">
+        <div class="dropzone" id="dropzone">
+          Drag &amp; Drop Files Here<br/>
+          or <strong>Click to Browse</strong>
+          <input type="file" id="fileInput" style="display:none;" multiple />
+        </div>
+        <div class="form-row">
+          <label for="titleUpload">Title</label>
+          <input type="text" id="titleUpload" placeholder="Title..." />
+        </div>
+        <div class="form-row">
+          <label for="categoryUpload">Category</label>
+          <input type="text" id="categoryUpload" placeholder="E.g. Logical Reasoning" />
+        </div>
+        <div class="form-row">
+          <label>Access</label>
+          <div>
+            <input type="radio" name="accessUpload" id="accessFree" value="Free" />
+            <label for="accessFree">Free</label>
+            <input type="radio" name="accessUpload" id="accessPremium" value="Premium" checked />
+            <label for="accessPremium">Premium</label>
+          </div>
+        </div>
+        <button class="btn" id="uploadBtn">Upload</button>
+      </div>
+      <!-- Tab Content: Create -->
+      <div class="tab-content" id="tabCreate">
+        <div class="form-row">
+          <label for="titleCreate">Title</label>
+          <input type="text" id="titleCreate" placeholder="Title..." />
+        </div>
+        <div class="form-row">
+          <label for="categoryCreate">Category</label>
+          <input type="text" id="categoryCreate" placeholder="E.g. Logical Reasoning" />
+        </div>
+        <div class="form-row">
+          <label>Content Body</label>
+          <textarea id="createBody" placeholder="Write or paste your content here..." style="height:80px;"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Access</label>
+          <div>
+            <input type="radio" name="accessCreate" id="accessFreeCreate" value="Free" />
+            <label for="accessFreeCreate">Free</label>
+            <input type="radio" name="accessCreate" id="accessPremiumCreate" value="Premium" checked />
+            <label for="accessPremiumCreate">Premium</label>
+          </div>
+        </div>
+        <button class="btn" id="createBtn">Save</button>
+      </div>
+      <!-- Tab Content: Link -->
+      <div class="tab-content" id="tabLink">
+        <div class="form-row">
+          <label for="titleLink">Title</label>
+          <input type="text" id="titleLink" placeholder="Title..." />
+        </div>
+        <div class="form-row">
+          <label for="categoryLink">Category</label>
+          <input type="text" id="categoryLink" placeholder="E.g. Logical Reasoning" />
+        </div>
+        <div class="form-row">
+          <label for="urlLink">URL</label>
+          <input type="url" id="urlLink" placeholder="https://example.com/resource" />
+        </div>
+        <div class="form-row">
+          <label>Access</label>
+          <div>
+            <input type="radio" name="accessLink" id="accessFreeLink" value="Free" />
+            <label for="accessFreeLink">Free</label>
+            <input type="radio" name="accessLink" id="accessPremiumLink" value="Premium" checked />
+            <label for="accessPremiumLink">Premium</label>
+          </div>
+        </div>
+        <button class="btn" id="linkBtn">Add Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*******************************************
+     * GLOBAL DATA KEYS & VARIABLES
+     *******************************************/
+    const LS_CLASSES = 'lsatClasses';
+    const LS_TUTORS = 'lsatTutors';
+    const LS_USERS = 'lsatUsers';
+    const LS_PROGRESS = 'lsatProgress';
+    const LS_ENROLLMENTS = 'lsatEnrollments';
+    const LS_FOLDERS = 'lsatFolders';
+
+    let classesData = [];
+    let tutorsData = [];
+    let usersData = [];
+    let progressData = [];
+    let enrollmentsData = [];
+    let foldersData = [];
+
+    // For content library
+    let inFolderView = false;
+    let currentFolderId = null;
+
+    /*******************************************
+     * INITIALIZATION
+     *******************************************/
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllFromStorage();
+      setupNav();
+      showSection('dashboardSection');
+      renderDashboard();
+
+      setupClasses();
+      renderClasses();
+
+      setupTutors();
+      renderTutors();
+
+      setupUsers();
+      renderUsers();
+
+      setupProgress();
+      renderProgress();
+
+      setupEnrollments();
+      renderEnrollments();
+
+      setupContentLibrary();
+      renderFolders();
+
+      // Generic modal close handler
+      document.getElementById('modalCloseGeneric').addEventListener('click', closeGenericModal);
+    });
+
+    /*******************************************
+     * STORAGE FUNCTIONS
+     *******************************************/
+    function loadAllFromStorage() {
+      classesData = JSON.parse(localStorage.getItem(LS_CLASSES) || '[]');
+      tutorsData = JSON.parse(localStorage.getItem(LS_TUTORS) || '[]');
+      usersData = JSON.parse(localStorage.getItem(LS_USERS) || '[]');
+      progressData = JSON.parse(localStorage.getItem(LS_PROGRESS) || '[]');
+      enrollmentsData = JSON.parse(localStorage.getItem(LS_ENROLLMENTS) || '[]');
+      foldersData = JSON.parse(localStorage.getItem(LS_FOLDERS) || '[]');
+    }
+    function saveAllToStorage() {
+      localStorage.setItem(LS_CLASSES, JSON.stringify(classesData));
+      localStorage.setItem(LS_TUTORS, JSON.stringify(tutorsData));
+      localStorage.setItem(LS_USERS, JSON.stringify(usersData));
+      localStorage.setItem(LS_PROGRESS, JSON.stringify(progressData));
+      localStorage.setItem(LS_ENROLLMENTS, JSON.stringify(enrollmentsData));
+      localStorage.setItem(LS_FOLDERS, JSON.stringify(foldersData));
+    }
+
+    /*******************************************
+     * NAVIGATION
+     *******************************************/
+    function setupNav() {
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', e => {
+          e.preventDefault();
+          navItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const sectionId = item.getAttribute('data-section');
+          showSection(sectionId);
+        });
+      });
+    }
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(s => s.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      if (sectionId === 'dashboardSection') renderDashboard();
+      if (sectionId === 'classesSection') renderClasses();
+      if (sectionId === 'tutorsSection') renderTutors();
+      if (sectionId === 'usersSection') renderUsers();
+      if (sectionId === 'progressSection') renderProgress();
+      if (sectionId === 'enrollmentsSection') renderEnrollments();
+      if (sectionId === 'contentLibrarySection') renderFolders();
+    }
+
+    /*******************************************
+     * DASHBOARD
+     *******************************************/
+    function renderDashboard() {
+      const dash = document.getElementById('dashboardStats');
+      dash.innerHTML = `
+        <div style="background:#2f3036; flex:1; min-width:200px; border-radius:8px; padding:1rem; text-align:center;">
+          <h3>Classes</h3>
+          <p style="font-size:1.2rem;">${classesData.length}</p>
+        </div>
+        <div style="background:#2f3036; flex:1; min-width:200px; border-radius:8px; padding:1rem; text-align:center;">
+          <h3>Tutors</h3>
+          <p style="font-size:1.2rem;">${tutorsData.length}</p>
+        </div>
+        <div style="background:#2f3036; flex:1; min-width:200px; border-radius:8px; padding:1rem; text-align:center;">
+          <h3>Users</h3>
+          <p style="font-size:1.2rem;">${usersData.length}</p>
+        </div>
+        <div style="background:#2f3036; flex:1; min-width:200px; border-radius:8px; padding:1rem; text-align:center;">
+          <h3>Enrollments</h3>
+          <p style="font-size:1.2rem;">${enrollmentsData.length}</p>
+        </div>
+        <div style="background:#2f3036; flex:1; min-width:200px; border-radius:8px; padding:1rem; text-align:center;">
+          <h3>Folders</h3>
+          <p style="font-size:1.2rem;">${foldersData.length}</p>
+        </div>
+      `;
+    }
+
+    /*******************************************
+     * CLASSES
+     *******************************************/
+    function setupClasses() {
+      document.getElementById('btnAddClass').addEventListener('click', () => {
+        openGenericModal('Add Class', getClassFormHTML(), saveClass);
+      });
+    }
+    function renderClasses() {
+      const list = document.getElementById('classesList');
+      list.innerHTML = '';
+      classesData.forEach(cls => {
+        const div = document.createElement('div');
+        div.classList.add('list-item');
+        div.innerHTML = `
+          <div>
+            <strong>${cls.name}</strong><br/>
+            <span style="font-size:0.85rem;color:#bbb;">${cls.description || ''}</span>
+          </div>
+          <button class="del-btn" data-id="${cls.id}">Delete</button>
+        `;
+        div.querySelector('button').addEventListener('click', () => {
+          classesData = classesData.filter(c => c.id !== cls.id);
+          saveAllToStorage();
+          renderClasses();
+          renderDashboard();
+        });
+        list.appendChild(div);
+      });
+    }
+    function getClassFormHTML() {
+      return `
+        <div class="form-row">
+          <label for="className">Class Name</label>
+          <input type="text" id="className"/>
+        </div>
+        <div class="form-row">
+          <label for="classDesc">Description</label>
+          <textarea id="classDesc"></textarea>
+        </div>
+      `;
+    }
+    function saveClass() {
+      const name = document.getElementById('className').value.trim();
+      const desc = document.getElementById('classDesc').value.trim();
+      if (!name) {
+        alert('Please enter a class name.');
+        return;
+      }
+      classesData.push({ id: genId(), name, description: desc });
+      saveAllToStorage();
+      closeGenericModal();
+      renderClasses();
+      renderDashboard();
+    }
+
+    /*******************************************
+     * TUTORS
+     *******************************************/
+    function setupTutors() {
+      document.getElementById('btnAddTutor').addEventListener('click', () => {
+        openGenericModal('Add Tutor', getTutorFormHTML(), saveTutor);
+      });
+    }
+    function renderTutors() {
+      const list = document.getElementById('tutorsList');
+      list.innerHTML = '';
+      tutorsData.forEach(tutor => {
+        const div = document.createElement('div');
+        div.classList.add('list-item');
+        div.innerHTML = `
+          <div>
+            <strong>${tutor.name}</strong><br/>
+            <span style="font-size:0.85rem;color:#bbb;">Expertise: ${tutor.expertise || 'N/A'}</span>
+          </div>
+          <button class="del-btn" data-id="${tutor.id}">Delete</button>
+        `;
+        div.querySelector('button').addEventListener('click', () => {
+          tutorsData = tutorsData.filter(t => t.id !== tutor.id);
+          saveAllToStorage();
+          renderTutors();
+          renderDashboard();
+        });
+        list.appendChild(div);
+      });
+    }
+    function getTutorFormHTML() {
+      return `
+        <div class="form-row">
+          <label for="tutorName">Tutor Name</label>
+          <input type="text" id="tutorName"/>
+        </div>
+        <div class="form-row">
+          <label for="tutorExpertise">Expertise</label>
+          <input type="text" id="tutorExpertise"/>
+        </div>
+      `;
+    }
+    function saveTutor() {
+      const name = document.getElementById('tutorName').value.trim();
+      const expertise = document.getElementById('tutorExpertise').value.trim();
+      if (!name) {
+        alert('Please enter a tutor name.');
+        return;
+      }
+      tutorsData.push({ id: genId(), name, expertise });
+      saveAllToStorage();
+      closeGenericModal();
+      renderTutors();
+      renderDashboard();
+    }
+
+    /*******************************************
+     * USERS
+     *******************************************/
+    function setupUsers() {
+      document.getElementById('btnAddUser').addEventListener('click', () => {
+        openGenericModal('Add User', getUserFormHTML(), saveUser);
+      });
+    }
+    function renderUsers() {
+      const list = document.getElementById('usersList');
+      list.innerHTML = '';
+      usersData.forEach(user => {
+        const div = document.createElement('div');
+        div.classList.add('list-item');
+        div.innerHTML = `
+          <div>
+            <strong>${user.name}</strong><br/>
+            <span style="font-size:0.85rem;color:#bbb;">Email: ${user.email || 'N/A'}</span>
+          </div>
+          <button class="del-btn" data-id="${user.id}">Delete</button>
+        `;
+        div.querySelector('button').addEventListener('click', () => {
+          usersData = usersData.filter(u => u.id !== user.id);
+          saveAllToStorage();
+          renderUsers();
+          renderDashboard();
+        });
+        list.appendChild(div);
+      });
+    }
+    function getUserFormHTML() {
+      return `
+        <div class="form-row">
+          <label for="userName">Name</label>
+          <input type="text" id="userName"/>
+        </div>
+        <div class="form-row">
+          <label for="userEmail">Email</label>
+          <input type="email" id="userEmail"/>
+        </div>
+      `;
+    }
+    function saveUser() {
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      if (!name) {
+        alert('Please enter a user name.');
+        return;
+      }
+      usersData.push({ id: genId(), name, email });
+      saveAllToStorage();
+      closeGenericModal();
+      renderUsers();
+      renderDashboard();
+    }
+
+    /*******************************************
+     * PROGRESS
+     *******************************************/
+    function setupProgress() {
+      document.getElementById('btnAddProgress').addEventListener('click', () => {
+        openGenericModal('Add Progress', getProgressFormHTML(), saveProgress);
+      });
+    }
+    function renderProgress() {
+      const tbody = document.getElementById('progressTableBody');
+      tbody.innerHTML = '';
+      progressData.forEach((prog, idx) => {
+        const user = usersData.find(u => u.id === prog.userId);
+        const cls = classesData.find(c => c.id === prog.classId);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${user ? user.name : 'Unknown'}</td>
+          <td>${cls ? cls.name : 'Unknown'}</td>
+          <td>${prog.percentage}%</td>
+          <td><button class="del-btn" data-idx="${idx}">Delete</button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => {
+          progressData.splice(idx, 1);
+          saveAllToStorage();
+          renderProgress();
+        });
+        tbody.appendChild(tr);
+      });
+    }
+    function getProgressFormHTML() {
+      return `
+        <div class="form-row">
+          <label for="progressUser">User</label>
+          <select id="progressUser">
+            ${usersData.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="progressClass">Class</label>
+          <select id="progressClass">
+            ${classesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="progressPercentage">Progress (%)</label>
+          <input type="number" id="progressPercentage" value="0" min="0" max="100"/>
+        </div>
+      `;
+    }
+    function saveProgress() {
+      const userId = document.getElementById('progressUser').value;
+      const classId = document.getElementById('progressClass').value;
+      const percentage = parseInt(document.getElementById('progressPercentage').value, 10) || 0;
+      progressData.push({ userId, classId, percentage });
+      saveAllToStorage();
+      closeGenericModal();
+      renderProgress();
+    }
+
+    /*******************************************
+     * ENROLLMENTS
+     *******************************************/
+    function setupEnrollments() {
+      document.getElementById('btnAddEnrollment').addEventListener('click', () => {
+        openGenericModal('Add Enrollment', getEnrollmentFormHTML(), saveEnrollment);
+      });
+    }
+    function renderEnrollments() {
+      const tbody = document.getElementById('enrollmentsTableBody');
+      tbody.innerHTML = '';
+      enrollmentsData.forEach((enroll, idx) => {
+        const user = usersData.find(u => u.id === enroll.userId);
+        const cls = classesData.find(c => c.id === enroll.classId);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${user ? user.name : 'Unknown'}</td>
+          <td>${cls ? cls.name : 'Unknown'}</td>
+          <td>${enroll.date}</td>
+          <td><button class="del-btn" data-idx="${idx}">Delete</button></td>
+        `;
+        tr.querySelector('button').addEventListener('click', () => {
+          enrollmentsData.splice(idx, 1);
+          saveAllToStorage();
+          renderEnrollments();
+        });
+        tbody.appendChild(tr);
+      });
+    }
+    function getEnrollmentFormHTML() {
+      return `
+        <div class="form-row">
+          <label for="enrollUser">User</label>
+          <select id="enrollUser">
+            ${usersData.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="enrollClass">Class</label>
+          <select id="enrollClass">
+            ${classesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="enrollDate">Date</label>
+          <input type="date" id="enrollDate" value="${new Date().toISOString().substr(0,10)}" />
+        </div>
+      `;
+    }
+    function saveEnrollment() {
+      const userId = document.getElementById('enrollUser').value;
+      const classId = document.getElementById('enrollClass').value;
+      const dateVal = document.getElementById('enrollDate').value;
+      enrollmentsData.push({ userId, classId, date: dateVal });
+      saveAllToStorage();
+      closeGenericModal();
+      renderEnrollments();
+    }
+
+    /*******************************************
+     * GENERIC MODAL
+     *******************************************/
+    function openGenericModal(title, bodyHTML, saveCallback) {
+      document.getElementById('genericModalTitle').textContent = title;
+      document.getElementById('genericModalBody').innerHTML = bodyHTML;
+      document.getElementById('modalBackdropGeneric').classList.add('active');
+      document.getElementById('genericModalSaveBtn').onclick = saveCallback;
+    }
+    function closeGenericModal() {
+      document.getElementById('modalBackdropGeneric').classList.remove('active');
+      document.getElementById('genericModalBody').innerHTML = '';
+    }
+    document.getElementById('modalCloseGeneric').addEventListener('click', closeGenericModal);
+
+    /*******************************************
+     * CONTENT LIBRARY FUNCTIONS
+     *******************************************/
+    function setupContentLibrary() {
+      // Create Folder modal
+      document.getElementById('btnCreateFolder').addEventListener('click', () => {
+        document.getElementById('modalBackdropFolder').classList.add('active');
+      });
+      document.getElementById('modalCloseFolder').addEventListener('click', () => {
+        document.getElementById('modalBackdropFolder').classList.remove('active');
+      });
+      document.getElementById('folderSaveBtn').addEventListener('click', createNewFolder);
+
+      // Add Content modal
+      document.getElementById('btnAddContent').addEventListener('click', () => openAddContentModal(false));
+      document.getElementById('btnAddContentInFolder')?.addEventListener('click', () => openAddContentModal(true));
+      document.getElementById('modalCloseContent').addEventListener('click', closeAddContentModal);
+
+      // Modal Tabs for Add Content
+      const modalTabs = document.querySelectorAll('.modal-tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      modalTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          modalTabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(tc => tc.classList.remove('active'));
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+
+      // File drop & input (for Upload tab)
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('fileInput');
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+      });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        // Process dropped files
+        const files = e.dataTransfer.files;
+        fileInput.files = files; // assign files to input for later processing
+      });
+
+      // Add Content Buttons
+      document.getElementById('uploadBtn').addEventListener('click', handleUploadContent);
+      document.getElementById('createBtn').addEventListener('click', handleCreateContent);
+      document.getElementById('linkBtn').addEventListener('click', handleLinkContent);
+
+      // Folder details back button
+      document.getElementById('btnBackToFolders')?.addEventListener('click', () => {
+        inFolderView = false;
+        currentFolderId = null;
+        document.getElementById('folderDetails').style.display = 'none';
+        document.getElementById('folderListView').style.display = 'block';
+        renderFolders();
+      });
+
+      // Search & Sort for folders
+      document.getElementById('searchInput').addEventListener('input', renderFolders);
+      document.getElementById('sortSelect').addEventListener('change', renderFolders);
+    }
+    function renderFolders() {
+      if (inFolderView) return;
+      const folderGrid = document.getElementById('folderGrid');
+      folderGrid.innerHTML = '';
+      let displayFolders = [...foldersData];
+      // Search filter
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (searchVal) {
+        displayFolders = displayFolders.filter(f => f.name.toLowerCase().includes(searchVal));
+      }
+      // Sorting
+      const sortVal = document.getElementById('sortSelect').value;
+      if (sortVal === 'date') {
+        displayFolders.sort((a, b) => b.createdAt - a.createdAt);
+      } else if (sortVal === 'name') {
+        displayFolders.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      displayFolders.forEach(folder => {
+        const card = document.createElement('div');
+        card.classList.add('folder-card');
+        card.innerHTML = `<div class="folder-icon">📁</div><div>${folder.name}</div>`;
+        card.addEventListener('click', () => openFolder(folder.id));
+        folderGrid.appendChild(card);
+      });
+    }
+    function createNewFolder() {
+      const folderName = document.getElementById('folderNameInput').value.trim();
+      if (!folderName) {
+        alert('Please enter a folder name.');
+        return;
+      }
+      foldersData.push({
+        id: genId(),
+        name: folderName,
+        createdAt: Date.now(),
+        content: []
+      });
+      saveAllToStorage();
+      document.getElementById('folderNameInput').value = '';
+      document.getElementById('modalBackdropFolder').classList.remove('active');
+      renderFolders();
+      renderDashboard();
+    }
+    function openFolder(folderId) {
+      inFolderView = true;
+      currentFolderId = folderId;
+      document.getElementById('folderListView').style.display = 'none';
+      document.getElementById('folderDetails').style.display = 'block';
+      renderFolderDetails();
+    }
+    function renderFolderDetails() {
+      const folder = foldersData.find(f => f.id === currentFolderId);
+      if (!folder) return;
+      document.getElementById('folderTitle').textContent = folder.name;
+      const contentList = document.getElementById('contentList');
+      contentList.innerHTML = '';
+      if (folder.content.length === 0) {
+        contentList.innerHTML = `<p style="color:#999;">No content yet.</p>`;
+        return;
+      }
+      folder.content.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('content-item');
+        div.innerHTML = `
+          <div class="content-info">
+            <h3>${item.title}</h3>
+            <div class="content-meta">
+              Category: ${item.category || 'None'} | Access: ${item.access} | Type: ${item.type}
+            </div>
+          </div>
+          <div class="content-actions">
+            <button data-id="${item.id}">Delete</button>
+          </div>
+        `;
+        div.querySelector('button').addEventListener('click', () => {
+          folder.content = folder.content.filter(i => i.id !== item.id);
+          saveAllToStorage();
+          renderFolderDetails();
+        });
+        contentList.appendChild(div);
+      });
+    }
+    function openAddContentModal(inFolder) {
+      document.getElementById('modalBackdropContent').classList.add('active');
+      if (inFolder) {
+        document.getElementById('contentFolderSelectRow').style.display = 'none';
+      } else {
+        document.getElementById('contentFolderSelectRow').style.display = 'block';
+        populateFolderSelect();
+      }
+    }
+    function closeAddContentModal() {
+      document.getElementById('modalBackdropContent').classList.remove('active');
+      resetContentForm();
+    }
+    function populateFolderSelect() {
+      const select = document.getElementById('contentFolderSelect');
+      select.innerHTML = '';
+      foldersData.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+      });
+    }
+    function resetContentForm() {
+      document.getElementById('titleUpload').value = '';
+      document.getElementById('categoryUpload').value = '';
+      document.getElementById('titleCreate').value = '';
+      document.getElementById('categoryCreate').value = '';
+      document.getElementById('createBody').value = '';
+      document.getElementById('titleLink').value = '';
+      document.getElementById('categoryLink').value = '';
+      document.getElementById('urlLink').value = '';
+      document.getElementById('accessPremium').checked = true;
+      document.getElementById('accessPremiumCreate').checked = true;
+      document.getElementById('accessPremiumLink').checked = true;
+      const modalTabs = document.querySelectorAll('.modal-tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      modalTabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(tc => tc.classList.remove('active'));
+      modalTabs[0].classList.add('active');
+      tabContents[0].classList.add('active');
+    }
+    function handleUploadContent() {
+      const title = document.getElementById('titleUpload').value.trim();
+      const category = document.getElementById('categoryUpload').value.trim();
+      const access = document.querySelector('input[name="accessUpload"]:checked')?.value || 'Premium';
+      if (!title) {
+        alert('Please enter a title.');
+        return;
+      }
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a file.');
+        return;
+      }
+      const files = fileInput.files;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // e.target.result is the base64 data URL
+        addContentItem({ type: 'upload', title, category, access, fileData: e.target.result, fileName: files[0].name });
+      }
+      reader.readAsDataURL(files[0]);
+    }
+    function handleCreateContent() {
+      const title = document.getElementById('titleCreate').value.trim();
+      const category = document.getElementById('categoryCreate').value.trim();
+      const body = document.getElementById('createBody').value.trim();
+      const access = document.querySelector('input[name="accessCreate"]:checked')?.value || 'Premium';
+      if (!title) {
+        alert('Please enter a title.');
+        return;
+      }
+      addContentItem({ type: 'create', title, category, access, body });
+    }
+    function handleLinkContent() {
+      const title = document.getElementById('titleLink').value.trim();
+      const category = document.getElementById('categoryLink').value.trim();
+      const url = document.getElementById('urlLink').value.trim();
+      const access = document.querySelector('input[name="accessLink"]:checked')?.value || 'Premium';
+      if (!title || !url) {
+        alert('Please enter a title and a valid URL.');
+        return;
+      }
+      addContentItem({ type: 'link', title, category, access, url });
+    }
+    function addContentItem(itemData) {
+      let folderId = currentFolderId;
+      if (!inFolderView) {
+        folderId = document.getElementById('contentFolderSelect').value;
+        if (!folderId) {
+          alert('Please select a folder.');
+          return;
+        }
+      }
+      const folder = foldersData.find(f => f.id === folderId);
+      if (!folder) {
+        alert('Folder not found.');
+        return;
+      }
+      folder.content.push({
+        id: genId(),
+        ...itemData,
+        dateCreated: Date.now()
+      });
+      saveAllToStorage();
+      closeAddContentModal();
+      if (inFolderView) {
+        renderFolderDetails();
+      } else {
+        renderFolders();
+      }
+      renderDashboard();
+    }
+
+    /*******************************************
+     * UTILITY FUNCTION
+     *******************************************/
+    function genId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+  </script>
+</body>
+</html>
