@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Synapse LSAT - Tutoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f7f9;
+      color: #333;
+      line-height: 1.6;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+    header {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      color: #fff;
+      padding: 1.5rem;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .hero {
+      background: url('https://source.unsplash.com/1600x400/?law,library') no-repeat center center/cover;
+      color: #fff;
+      padding: 3rem 1rem;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .section h2 {
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      color: #555;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .btn {
+      display: inline-block;
+      background: #3498db;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #2980b9;
+    }
+    /* Registration Message */
+    #registerMessage {
+      margin-top: 0.5rem;
+      color: #16a085;
+      font-weight: 700;
+    }
+    /* Dropdown lists for classes and tutors */
+    select {
+      background: #fff;
+      color: #333;
+    }
+    /* Content Library Styles */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .folder-card {
+      background: #ecf0f1;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .folder-card:hover {
+      transform: scale(1.05);
+    }
+    .folder-card .folder-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .content-list {
+      list-style: none;
+      padding: 0;
+    }
+    .content-list li {
+      background: #fff;
+      padding: 0.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      .hero h2 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Branding & Hero -->
+    <header>
+      <!-- The BrainCircuit graphic inserted as an inline SVG -->
+      <div style="display:flex; justify-content:center; align-items:center; gap:0.5rem;">
+        <svg class="w-12 h-12" style="width:3rem;height:3rem;fill:#60a5fa;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <!-- This is a placeholder for your BrainCircuit icon; replace with your actual SVG paths if needed -->
+          <path d="M12 2C8.13 2 5 5.13 5 9v3c0 2.25 1.5 4.25 3.75 4.75L9 20h6l.25-3.25C17.5 16.25 19 14.25 19 12V9c0-3.87-3.13-7-7-7z"/>
+          <path d="M8 9h8"/>
+        </svg>
+        <h1>Synapse LSAT</h1>
+      </div>
+      <p>Transform your LSAT prep with our unique 3-Pass System: Core Concepts, Natural Language Mastery, and Algorithmic Intuition.</p>
+    </header>
+
+    <!-- Registration Section -->
+    <div class="section" id="registration">
+      <h2>Register / Log In</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="username">Name</label>
+          <input type="text" id="username" placeholder="Enter your name" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a password" required />
+        </div>
+        <button type="submit" class="btn">Register / Log In</button>
+      </form>
+      <p id="registerMessage"></p>
+    </div>
+
+    <!-- Classes & Tutoring Section -->
+    <div class="section" id="classesSection">
+      <h2>Available Classes & Tutoring Sessions</h2>
+      <!-- This dropdown is populated from the admin application's classes -->
+      <div class="form-group">
+        <label for="classSelect">Select a Class</label>
+        <select id="classSelect" required>
+          <option value="">-- Select a Class --</option>
+        </select>
+      </div>
+      <!-- Tutors dropdown is populated from admin tutors -->
+      <div class="form-group">
+        <label for="tutorSelect">Select a Tutor</label>
+        <select id="tutorSelect" required>
+          <option value="">-- Select a Tutor --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="sessionDate">Preferred Date & Time</label>
+        <input type="datetime-local" id="sessionDate" required />
+      </div>
+      <button type="button" class="btn" id="bookSessionBtn">Book Tutoring Session</button>
+      <p id="bookingMessage" style="margin-top: 0.5rem; color: #16a085;"></p>
+    </div>
+
+    <!-- Subscription & Content Library Section -->
+    <div class="section" id="subscriptionSection">
+      <h2>Subscription Service</h2>
+      <p>Subscribe to our premium video and resource library for exclusive LSAT content.</p>
+      <form id="subscriptionForm">
+        <div class="form-group">
+          <label for="subscriptionEmail">Email</label>
+          <input type="email" id="subscriptionEmail" placeholder="Enter your email" required />
+        </div>
+        <button type="submit" class="btn">Subscribe Now</button>
+      </form>
+      <p id="subscriptionMessage" style="margin-top: 0.5rem; color: #16a085;"></p>
+      <h2>Content Library</h2>
+      <!-- Folders are created in the admin app and synced via LS_FOLDERS -->
+      <div class="folder-grid" id="folderGrid">
+        <!-- Folder cards are rendered here -->
+      </div>
+      <ul id="contentList" class="content-list">
+        <!-- If a folder is clicked, its content items will be listed here -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    /**************************************************
+     * LOCAL STORAGE KEYS (shared with admin app)
+     **************************************************/
+    const LS_CLASSES = 'lsatClasses';
+    const LS_TUTORS  = 'lsatTutors';
+    const LS_USERS   = 'lsatUsers';
+    const LS_BOOKINGS = 'lsatBookings';
+    const LS_FOLDERS = 'lsatFolders';
+    
+    /**************************************************
+     * GLOBAL VARIABLES
+     **************************************************/
+    let currentUser = null; // Registered/logged-in user
+    let folders = [];       // Content library folders
+
+    /**************************************************
+     * INITIALIZE APPLICATION
+     **************************************************/
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserData();
+      loadFolders();
+      populateClassesAndTutors();
+      renderFolders();
+      setupRegistrationForm();
+      setupBooking();
+      setupSubscription();
+    });
+
+    /**************************************************
+     * REGISTRATION / LOGIN
+     **************************************************/
+    function setupRegistrationForm() {
+      const regForm = document.getElementById('registerForm');
+      regForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        if (!name || !email || !password) {
+          alert('Please fill in all fields.');
+          return;
+        }
+        let users = JSON.parse(localStorage.getItem(LS_USERS) || '[]');
+        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (!user) {
+          // Register new user
+          user = { id: generateId(), name, email, password };
+          users.push(user);
+          localStorage.setItem(LS_USERS, JSON.stringify(users));
+          document.getElementById('registerMessage').textContent = 'Registration successful!';
+        } else {
+          // Log in if password matches (simple demo; no encryption)
+          if (user.password !== password) {
+            alert('Incorrect password.');
+            return;
+          }
+          document.getElementById('registerMessage').textContent = 'Logged in successfully!';
+        }
+        currentUser = user;
+      });
+    }
+    function loadUserData() {
+      // For demo, we simply load current user from LS_USERS if exists.
+      // In a real app, use proper authentication.
+      // Here, if there’s any user registered, we let the first one be "logged in"
+      const users = JSON.parse(localStorage.getItem(LS_USERS) || '[]');
+      if (users.length > 0) {
+        currentUser = users[0];
+      }
+    }
+    function generateId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    /**************************************************
+     * CLASSES & TUTORS DROPDOWNS (sync with admin)
+     **************************************************/
+    function populateClassesAndTutors() {
+      // Populate classes dropdown from localStorage
+      const classSelect = document.getElementById('classSelect');
+      classSelect.innerHTML = '<option value="">-- Select a Class --</option>';
+      const classes = JSON.parse(localStorage.getItem(LS_CLASSES) || '[]');
+      classes.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls.id;
+        option.textContent = cls.name;
+        classSelect.appendChild(option);
+      });
+
+      // Populate tutors dropdown from localStorage
+      const tutorSelect = document.getElementById('tutorSelect');
+      tutorSelect.innerHTML = '<option value="">-- Select a Tutor --</option>';
+      const tutors = JSON.parse(localStorage.getItem(LS_TUTORS) || '[]');
+      tutors.forEach(tutor => {
+        const option = document.createElement('option');
+        option.value = tutor.id;
+        option.textContent = tutor.name;
+        tutorSelect.appendChild(option);
+      });
+    }
+
+    /**************************************************
+     * BOOKING TUTORING SESSION
+     **************************************************/
+    function setupBooking() {
+      document.getElementById('bookSessionBtn').addEventListener('click', () => {
+        if (!currentUser) {
+          alert('Please register or log in first.');
+          return;
+        }
+        const classId = document.getElementById('classSelect').value;
+        const tutorId = document.getElementById('tutorSelect').value;
+        const sessionDate = document.getElementById('sessionDate').value;
+        if (!classId || !tutorId || !sessionDate) {
+          alert('Please select a class, tutor, and session date/time.');
+          return;
+        }
+        let bookings = JSON.parse(localStorage.getItem(LS_BOOKINGS) || '[]');
+        bookings.push({
+          id: generateId(),
+          userEmail: currentUser.email,
+          classId,
+          tutorId,
+          sessionDate
+        });
+        localStorage.setItem(LS_BOOKINGS, JSON.stringify(bookings));
+        document.getElementById('bookingMessage').textContent = 'Tutoring session booked successfully!';
+      });
+    }
+
+    /**************************************************
+     * SUBSCRIPTION & CONTENT LIBRARY
+     **************************************************/
+    function setupSubscription() {
+      document.getElementById('subscriptionForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const subEmail = document.getElementById('subscriptionEmail').value.trim();
+        if (!subEmail) {
+          alert('Please enter an email.');
+          return;
+        }
+        // For demo, we simply show a message. In production, integrate with payment gateway.
+        document.getElementById('subscriptionMessage').textContent = 'Subscription activated!';
+      });
+    }
+
+    function loadFolders() {
+      folders = JSON.parse(localStorage.getItem(LS_FOLDERS) || '[]');
+    }
+    function renderFolders() {
+      const folderGrid = document.getElementById('folderGrid');
+      folderGrid.innerHTML = '';
+      // For tutoring, we simply show the folder cards and when clicked, list the content.
+      folders.forEach(folder => {
+        const card = document.createElement('div');
+        card.classList.add('folder-card');
+        card.innerHTML = `<div class="folder-icon">📁</div><div>${folder.name}</div>`;
+        card.addEventListener('click', () => openFolder(folder.id));
+        folderGrid.appendChild(card);
+      });
+    }
+    function openFolder(folderId) {
+      // When a folder is clicked, display its content items below the grid
+      const folder = folders.find(f => f.id === folderId);
+      if (!folder) return;
+      const contentList = document.getElementById('contentList');
+      contentList.innerHTML = '';
+      if (folder.content.length === 0) {
+        contentList.innerHTML = '<li>No content available in this folder.</li>';
+      } else {
+        folder.content.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `${item.title} (Type: ${item.type}, Access: ${item.access})`;
+          contentList.appendChild(li);
+        });
+      }
+    }
+
+    /**************************************************
+     * INITIALIZE: RELOAD DATA WHEN PAGE LOADS
+     **************************************************/
+    // Ensure that when the tutoring app loads, it pulls the latest admin data
+    function reloadAdminData() {
+      populateClassesAndTutors();
+      loadFolders();
+      renderFolders();
+    }
+    // Periodically refresh admin-synced data (e.g., every 5 seconds)
+    setInterval(reloadAdminData, 5000);
+
+  </script>
+</body>
+</html>
